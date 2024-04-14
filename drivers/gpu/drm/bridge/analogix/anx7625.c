@@ -1470,6 +1470,8 @@ static void anx7625_start_dp_work(struct anx7625_data *ctx)
 		return;
 
 	DRM_DEV_DEBUG_DRIVER(dev, "Secure OCM version=%02x\n", ret);
+
+	ctx->display_timing_valid = 1;
 }
 
 static int anx7625_read_hpd_status_p0(struct anx7625_data *ctx)
