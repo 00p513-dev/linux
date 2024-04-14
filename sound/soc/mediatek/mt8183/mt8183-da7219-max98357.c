@@ -621,7 +621,7 @@ struct snd_soc_dapm_widget mt8183_da7219_max98357_dapm_widgets[] = {
 
 static const struct snd_soc_dapm_route mt8183_da7219_max98357_dapm_routes[] = {
 	{"Speakers", NULL, "Speaker"},
-	{"I2S Playback", NULL, "TDM_OUT_PINCTRL"},
+//	{"I2S Playback", NULL, "TDM_OUT_PINCTRL"},
 };
 
 static struct snd_soc_card mt8183_da7219_max98357_card = {
