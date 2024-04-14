@@ -1397,6 +1397,8 @@ static void anx7625_power_on_init(struct anx7625_data *ctx)
 		}
 		anx7625_power_standby(ctx);
 	}
+	if (ctx->link)
+		device_link_del(ctx->link);
 }
 
 static void anx7625_init_gpio(struct anx7625_data *platform)
@@ -2217,17 +2219,33 @@ static int anx7625_bridge_attach(struct drm_bridge *bridge,
 		return err;
 	}
 
+	ctx->link = device_link_add(bridge->dev->dev, dev, DL_FLAG_STATELESS);
+	if (!ctx->link) {
+		DRM_DEV_ERROR(dev, "device link creation failed");
+		err = -EINVAL;
+		goto detach_dsi;
+	}
+
 	if (ctx->pdata.panel_bridge) {
 		err = drm_bridge_attach(bridge->encoder,
 					ctx->pdata.panel_bridge,
 					&ctx->bridge, flags);
 		if (err)
-			return err;
+			goto remove_device_link;
 	}
 
 	ctx->bridge_attached = 1;
 
 	return 0;
+
+remove_device_link:
+	device_link_del(ctx->link);
+detach_dsi:
+	if (ctx->dsi) {
+		mipi_dsi_detach(ctx->dsi);
+		mipi_dsi_device_unregister(ctx->dsi);
+	}
+	return err;
 }
 
 static void anx7625_bridge_detach(struct drm_bridge *bridge)
